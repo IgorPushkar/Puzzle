@@ -8,6 +8,8 @@ public class SelectPuzzle : MonoBehaviour {
 	[SerializeField]
 	private GameObject[] gameplayPanels;
 	[SerializeField]
+	private GameObject[] levelButtons;
+	[SerializeField]
 	private Animator[] gameplayAnimators;
 	private int currentLevel;
 	[SerializeField]
@@ -68,8 +70,11 @@ public class SelectPuzzle : MonoBehaviour {
 
 	IEnumerator GameplayToLevel(){
 		GameObject.Find("Game Controller").GetComponent<GameController> ().EndLevel();
+		foreach(GameObject obj in levelButtons){
+			obj.GetComponent<LevelButtonController> ().ReinitializeButton ();
+		}
 		blockPanel.SetActive (true);
-		yield return new WaitForSeconds (0.5f);
+		yield return new WaitForSeconds (0.25f);
 		levelSelectPanel.SetActive (true);
 		gameplayAnimators[currentLevel].Play ("SlideOut");
 		yield return new WaitForSeconds (0.5f);

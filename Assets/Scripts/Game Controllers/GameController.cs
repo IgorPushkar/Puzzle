@@ -162,6 +162,7 @@ public class GameController : MonoBehaviour {
 
 	void ShowEndLevelPanel(){
 		CalculateStarsEarned ();
+		UnlockNextLevel ();
 		StartCoroutine (ShowPanel ());
 	}
 
@@ -170,23 +171,12 @@ public class GameController : MonoBehaviour {
 	}
 
 	IEnumerator HidePanel(){
-		switch(starsEarned){
-		case 3:
-			star3Anim.Play ("FadeOut");
-			star2Anim.Play ("FadeOut");
-			star1Anim.Play ("FadeOut");
-			break;
-		case 2:
-			star2Anim.Play ("FadeOut");
-			star1Anim.Play ("FadeOut");
-			break;
-		case 1:
-			star1Anim.Play ("FadeOut");
-			break;
-		}
-		textAnim.Play ("FadeOut");
-		yield return new WaitForSeconds (1f);
 		endLevelAnim.Play ("FadeOut");
+		yield return new WaitForSeconds (1f);
+		star3Anim.Play ("FadeOut");
+		star2Anim.Play ("FadeOut");
+		star1Anim.Play ("FadeOut");
+		textAnim.Play ("FadeOut");
 		yield return new WaitForSeconds (1f);
 		endLevelPanel.SetActive (false);
 	}
@@ -258,6 +248,15 @@ public class GameController : MonoBehaviour {
 				starsEarned = 0;
 			}
 			break;
+		}
+		if (starsEarned > PlayerPrefsController.GetStars (level)) {
+			PlayerPrefsController.SetStars (level, starsEarned);
+		}
+	}
+
+	void UnlockNextLevel(){
+		if(level < 3 && !PlayerPrefsController.GetLevel(level + 1)){
+			PlayerPrefsController.SetLevel (level + 1);
 		}
 	}
 }
