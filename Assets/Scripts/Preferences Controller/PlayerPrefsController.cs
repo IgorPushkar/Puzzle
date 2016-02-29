@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine;
 using System.Collections;
 
 public static class PlayerPrefsController{
@@ -135,12 +134,14 @@ public static class PlayerPrefsController{
 	}
 
 	public static float GetMusic(){
-		if(PlayerPrefs.HasKey(MUSIC_KEY)){
-			return PlayerPrefs.GetFloat (MUSIC_KEY);
-		} else {
-			Debug.LogWarning ("Music volume in wrong format or invalid");
-			return 0.7f;
+		if(!PlayerPrefs.HasKey(MUSIC_KEY)){
+			PlayerPrefs.SetFloat (MUSIC_KEY, 0.7f);
 		}
+		return PlayerPrefs.GetFloat (MUSIC_KEY);
 	}
 	#endregion
+
+	public static void ResetAllKeys(){
+		PlayerPrefs.DeleteAll ();
+	}
 }

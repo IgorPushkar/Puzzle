@@ -16,8 +16,8 @@ public class SelectPuzzle : MonoBehaviour {
 	private Animator puzzleSelectAnimator, levelSelectAnimator;
 	public static string selectedPuzzle;
 
-	public void ToLevelSelect(){
-		selectedPuzzle = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
+	public void ToLevelSelect(string puzzle){
+		selectedPuzzle = puzzle;
 		StartCoroutine (PuzzleToLevelSelect ());
 	}
 
@@ -25,8 +25,8 @@ public class SelectPuzzle : MonoBehaviour {
 		StartCoroutine (LevelToPuzzleSelect ());
 	}
 
-	public void ToGameplay(){
-		currentLevel = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+	public void ToGameplay(int level){
+		currentLevel = level;
 		StartCoroutine (LevelToGameplay ());
 	}
 
@@ -37,6 +37,9 @@ public class SelectPuzzle : MonoBehaviour {
 	IEnumerator PuzzleToLevelSelect(){
 		blockPanel.SetActive (true);
 		levelSelectPanel.SetActive (true);
+		foreach(GameObject obj in levelButtons){
+			obj.GetComponent<LevelButtonController> ().ReinitializeButton ();
+		}
 		puzzleSelectAnimator.Play ("SlideIn2");
 		yield return new WaitForSeconds (0.5f);
 		levelSelectAnimator.Play ("SlideIn");
@@ -57,9 +60,9 @@ public class SelectPuzzle : MonoBehaviour {
 	}
 
 	IEnumerator LevelToGameplay(){
-		GameObject.Find("Game Controller").GetComponent<GameController> ().StartLevel (int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name));
 		blockPanel.SetActive (true);
 		gameplayPanels[currentLevel].SetActive (true);
+		GameObject.Find("Game Controller").GetComponent<GameController> ().StartLevel (currentLevel);
 		levelSelectAnimator.Play ("SlideIn2");
 		yield return new WaitForSeconds (0.5f);
 		gameplayAnimators[currentLevel].Play ("SlideIn");

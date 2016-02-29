@@ -24,6 +24,10 @@ public class GameController : MonoBehaviour {
 	private int openedCount, puzzlesLeft, guessCount;
 	private GameObject[] opened = new GameObject[2];
 
+	void Start(){
+		LoadSprites ();
+	}
+
 	void LoadSprites(){
 		puzzleSprites.Add(Resources.LoadAll<Sprite>("Sprites/Candy"));
 		puzzleSprites.Add(Resources.LoadAll<Sprite>("Sprites/Transport"));
@@ -73,8 +77,6 @@ public class GameController : MonoBehaviour {
 			buttonsCount = 30;
 			break;
 		}
-
-		LoadSprites ();
 		switch(SelectPuzzle.selectedPuzzle){
 		case "Candy Puzzle":
 			puzzleType = 0;
@@ -105,8 +107,8 @@ public class GameController : MonoBehaviour {
 			GameObject btn = (GameObject)Instantiate (button);
 			btn.gameObject.name = "" + i;
 			btn.transform.SetParent (levelPanels[level].transform.FindChild ("Buttons Holder").transform, false);
-			btn.GetComponent<Image>().sprite = backside [puzzleType];
-			btn.GetComponent<Button>().onClick.AddListener (() => Click ());
+			btn.GetComponentInChildren<Image>().sprite = backside [puzzleType];
+			btn.GetComponentInChildren<Button>().onClick.AddListener (() => Click (int.Parse(btn.gameObject.name)));
 			buttonsList.Add (btn);
 		}
 	}
@@ -118,11 +120,9 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	public void Click(){
+	public void Click(int index){
 		if(openedCount < 2){
-			int index = int.Parse (UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
 			opened [openedCount] = buttonsList [index];
-			opened[openedCount].GetComponent<Animator> ().Play("TurnUp");
 			StartCoroutine (TurnCard (opened [openedCount], index));
 			openedCount++;
 		}
@@ -132,23 +132,26 @@ public class GameController : MonoBehaviour {
 	}
 
 	IEnumerator TurnCard(GameObject button, int index){
+		opened [openedCount].GetComponent<Animator> ().Play ("TurnUp");
 		yield return new WaitForSeconds (0.5f);
-		button.GetComponent<Image>().sprite = gameSprites[index];
+		button.GetComponentInChildren<Image>().sprite = gameSprites[index];
 	}
 
 	IEnumerator CompareCards(){
 		blockPanel.SetActive (true);
 		yield return new WaitForSeconds (1f);
-		if(opened[0].GetComponent<Image>().sprite.name.Equals(opened[1].GetComponent<Image>().sprite.name)){
+		if(opened[0].GetComponentInChildren<Image>().sprite.name.Equals(opened[1].GetComponentInChildren<Image>().sprite.name)){
+			yield return new WaitForSeconds (0.25f);
 			opened[0].GetComponent<Animator> ().Play("FadeOut");
 			opened[1].GetComponent<Animator> ().Play("FadeOut");
 			puzzlesLeft -= 2;
 		} else {
+			yield return new WaitForSeconds (0.25f);
 			opened[0].GetComponent<Animator> ().Play("TurnBack");
 			opened[1].GetComponent<Animator> ().Play("TurnBack");
 			yield return new WaitForSeconds (0.5f);
-			opened[0].GetComponent<Image>().sprite = backside [puzzleType];
-			opened[1].GetComponent<Image>().sprite = backside [puzzleType];
+			opened[0].GetComponentInChildren<Image>().sprite = backside [puzzleType];
+			opened[1].GetComponentInChildren<Image>().sprite = backside [puzzleType];
 
 		}
 		opened = new GameObject[2];
@@ -156,6 +159,7 @@ public class GameController : MonoBehaviour {
 		openedCount = 0;
 		blockPanel.SetActive (false);
 		if(puzzlesLeft <= 0){
+			yield return new WaitForSeconds (0.5f);
 			ShowEndLevelPanel ();
 		}
 	}
@@ -171,14 +175,16 @@ public class GameController : MonoBehaviour {
 	}
 
 	IEnumerator HidePanel(){
-		endLevelAnim.Play ("FadeOut");
-		yield return new WaitForSeconds (1f);
-		star3Anim.Play ("FadeOut");
-		star2Anim.Play ("FadeOut");
-		star1Anim.Play ("FadeOut");
-		textAnim.Play ("FadeOut");
-		yield return new WaitForSeconds (1f);
-		endLevelPanel.SetActive (false);
+		if (endLevelPanel.activeInHierarchy) {
+			endLevelAnim.Play ("FadeOut");
+			yield return new WaitForSeconds (1f);
+			star3Anim.Play ("FadeOut");
+			star2Anim.Play ("FadeOut");
+			star1Anim.Play ("FadeOut");
+			textAnim.Play ("FadeOut");
+			yield return new WaitForSeconds (1f);
+			endLevelPanel.SetActive (false);
+		}
 	}
 
 	IEnumerator ShowPanel (){

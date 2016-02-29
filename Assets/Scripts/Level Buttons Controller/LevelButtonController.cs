@@ -18,6 +18,12 @@ public class LevelButtonController : MonoBehaviour {
 	}
 
 	void InitializeButton(){
+		button.interactable = false;
+		stars [0].SetActive (false);
+		stars [1].SetActive (false);
+		stars [2].SetActive (false);
+		starsHolder.SetActive (false);
+		padlock.SetActive (true);
 		if (PlayerPrefsController.GetLevel (level)) {
 			button.interactable = PlayerPrefsController.GetLevel (level);
 			starsHolder.SetActive (button.interactable);
